@@ -17,29 +17,32 @@ CHECK_INTERVAL = 10
 CHANNEL_LIST = [
         "UCJHA_jMfCvEnv-3kRjTCQXw", #BingingWithBabish
         "UCtinbF-Q-fVthA0qrFQTgXQ", #CaseyNeistat
+        "UCPD_bxCRGpmmeQcbe2kpPaA", #FirstWeFeast
         "UCXuqSBlHAE6Xw-yeJA0Tunw", #LinusTechTips
         "UCRZAa0ay5dZT71_efD-YlOg", #MaxxChewning
         "UCBJycsmduvYEL83R_U4JriQ", #MKBHD
         "UCddiUEpeqJcYeBxX1IVBKvQ", #TheVerge
+        "UCSpFnDQr88xCZ80N-X7t0nQ", #SamAndNiko
+        "UC6107grRI4m0o2-emgoDnAA", #SmarterEveryDay
     ]
 
 #YoutubeBlue Main
 def youtube_blue_main():
-    print "Starting YoutubeBlue Stashing Script..."
+    print("Starting YoutubeBlue Stashing Script...")
 
     if len(sys.argv) != 3:
-        print "Error incorrect # of Args. Exiting..."
+        print("Error incorrect # of Args. Exiting...")
         sys.exit(0)
 
     OUTPUT_DIR = sys.argv[1]
     KEY_FILE = sys.argv[2]
 
     if not os.path.isdir(OUTPUT_DIR):
-        print "Error "+OUTPUT_DIR+" is not a directory. Exiting..."
+        print("Error "+OUTPUT_DIR+" is not a directory. Exiting...")
         sys.exit(0)
 
     if not os.path.isfile(KEY_FILE):
-        print "Error "+OUTPUT_DIR+" is not a file. Exiting..."
+        print("Error "+OUTPUT_DIR+" is not a file. Exiting...")
         sys.exit(0)
 
     with open(KEY_FILE) as inputfile:
@@ -92,10 +95,10 @@ def repeat_task(execution_interval, check_interval, key, output_directory):
     while (True):
         start_time = datetime.datetime.now()
         execute_time = start_time + datetime.timedelta(seconds=execution_interval)
-        print "Starting Process at " + start_time.isoformat() 
-        print "Next Execution at " + execute_time.isoformat()
+        print("Starting Process at " + start_time.isoformat())
+        print("Next Execution at " + execute_time.isoformat())
         get_videos(CHANNEL_LIST, key, output_directory)
-        print "Execution Complete waiting until " + execute_time.isoformat()
+        print("Execution Complete waiting until " + execute_time.isoformat())
         while(execute_time > datetime.datetime.now()):
             time.sleep(check_interval)
 
