@@ -14,17 +14,9 @@ from apiclient.discovery import build
 
 DOWNLOAD_INTERVAL = 60*30
 CHECK_INTERVAL = 10
-CHANNEL_LIST = [
-        "UCJHA_jMfCvEnv-3kRjTCQXw", #BingingWithBabish
-        "UCtinbF-Q-fVthA0qrFQTgXQ", #CaseyNeistat
-        "UCPD_bxCRGpmmeQcbe2kpPaA", #FirstWeFeast
-        "UCXuqSBlHAE6Xw-yeJA0Tunw", #LinusTechTips
-        "UCRZAa0ay5dZT71_efD-YlOg", #MaxxChewning
-        "UCBJycsmduvYEL83R_U4JriQ", #MKBHD
-        "UCddiUEpeqJcYeBxX1IVBKvQ", #TheVerge
-        "UCSpFnDQr88xCZ80N-X7t0nQ", #SamAndNiko
-        "UC6107grRI4m0o2-emgoDnAA", #SmarterEveryDay
-    ]
+USER_ID = "UC0WsHnTEn3k4QNGs8BaH38g"
+NUM_DAYS = 2
+
 
 #YoutubeBlue Main
 def youtube_blue_main():
@@ -49,7 +41,21 @@ def youtube_blue_main():
         for line in inputfile:
             KEY = line
 
-    repeat_task(DOWNLOAD_INTERVAL, CHECK_INTERVAL, KEY, OUTPUT_DIR, 2)
+    repeat_task(USER_ID, DOWNLOAD_INTERVAL, CHECK_INTERVAL, KEY, OUTPUT_DIR, NUM_DAYS)
+
+
+#Get Subscriptions from User
+def get_subs(user_id, key):
+    youtube = build('youtube', 'v3', developerKey=key)
+    sub_response = youtube.subscriptions().list(
+        part='snippet',
+        channelId=user_id,
+        maxResults=50
+        ).execute()
+    subs = []
+    for sub in sub_response['items']:
+        subs.append(sub['snippet']['resourceId']['channelId'])
+    return subs
 
 
 #Downloads Videos from Channels in Channel List
@@ -93,22 +99,24 @@ def get_videos(channel_list, key, output_directory, num_days):
 
 
 #Executes get_videos Periodically 
-def repeat_task(execution_interval, check_interval, key, output_directory, num_days):
+def repeat_task(user_id, execution_interval, check_interval, key, output_directory, num_days):
     while (True):
         start_time = datetime.datetime.now()
         execute_time = start_time + datetime.timedelta(seconds=execution_interval)
         print("Starting Process at " + start_time.isoformat())
         print("Next Execution at " + execute_time.isoformat())
-        get_videos(CHANNEL_LIST, key, output_directory, num_days)
+        get_videos(get_subs(user_id, key), key, output_directory, num_days)
         print("Execution Complete waiting until " + execute_time.isoformat())
         while(execute_time > datetime.datetime.now()):
             time.sleep(check_interval)
+
 
 #Deletes older videos
 def delete_old(output_directory, days_delete):
     print("Deleting the Following Videos...")
     call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-depth", "-print"])
     call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-delete"])
+
 
 if __name__ == "__main__":
     youtube_blue_main()
