@@ -113,6 +113,9 @@ def repeat_task(user_id, execution_interval, check_interval, key, output_directo
 
 #Deletes older videos
 def delete_old(output_directory, days_delete):
+    if os.name == 'nt':
+        print("Cannot Delete on Windows")
+        return
     print("Deleting the Following Videos...")
     call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-depth", "-print"])
     call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-delete"])
