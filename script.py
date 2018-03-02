@@ -15,7 +15,7 @@ from apiclient.discovery import build
 DOWNLOAD_INTERVAL = 60*30
 CHECK_INTERVAL = 10
 USER_ID = "UC0WsHnTEn3k4QNGs8BaH38g"
-NUM_DAYS = 2
+NUM_DAYS = 1
 
 
 #YoutubeBlue Main
