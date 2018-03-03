@@ -6,6 +6,7 @@
 
 import sys
 import os
+import argparse
 import datetime
 import time
 import threading
@@ -14,34 +15,45 @@ from apiclient.discovery import build
 
 DOWNLOAD_INTERVAL = 60*30
 CHECK_INTERVAL = 10
-USER_ID = "UC0WsHnTEn3k4QNGs8BaH38g"
-NUM_DAYS = 2
+NUM_DAYS = 1
+
+
+#YoutubeBlue CML Arguements
+def parse_arguements(): 
+    parser = argparse.ArgumentParser(description='Process some YoutubeBlue Args.')
+    parser.add_argument('dest', nargs='+', help='Downloads Destination')
+    parser.add_argument('--key', nargs='?', help='Youtube API Key Text File')
+    parser.add_argument('--user', nargs='?', help='Youtube User Channel ID Text File')
+    args = parser.parse_args()
+    
+    if not args.dest or len(args.dest) != 1 or not os.path.isdir(args.dest[0]):
+        print("No destination path. Exiting...")
+        sys.exit(0)
+    if not args.key or not os.path.isfile(args.key):
+        print("--key Arg is Invalid. Exiting...")
+        sys.exit(0)
+    if not args.user or not os.path.isfile(args.user):
+        print("--user Arg is Invalid. Exiting...")
+        sys.exit(0)
+
+    return args
 
 
 #YoutubeBlue Main
 def youtube_blue_main():
     print("Starting YoutubeBlue Stashing Script...")
 
-    if len(sys.argv) != 3:
-        print("Error incorrect # of Args. Exiting...")
-        sys.exit(0)
+    args = parse_arguements()
 
-    OUTPUT_DIR = sys.argv[1]
-    KEY_FILE = sys.argv[2]
-
-    if not os.path.isdir(OUTPUT_DIR):
-        print("Error "+OUTPUT_DIR+" is not a directory. Exiting...")
-        sys.exit(0)
-
-    if not os.path.isfile(KEY_FILE):
-        print("Error "+OUTPUT_DIR+" is not a file. Exiting...")
-        sys.exit(0)
-
-    with open(KEY_FILE) as inputfile:
+    OUTPUT_DIR = args.dest[0]
+    with open(args.key) as inputfile:
         for line in inputfile:
             KEY = line
+    with open(args.user) as inputfile:
+        for line in inputfile:
+            USER = line
 
-    repeat_task(USER_ID, DOWNLOAD_INTERVAL, CHECK_INTERVAL, KEY, OUTPUT_DIR, NUM_DAYS)
+    repeat_task(USER, DOWNLOAD_INTERVAL, CHECK_INTERVAL, KEY, OUTPUT_DIR, NUM_DAYS)
 
 
 #Get Subscriptions from User
