@@ -7,6 +7,7 @@
 import sys
 import os
 import argparse
+import socket
 import datetime
 import time
 import threading
@@ -63,8 +64,13 @@ def repeat_task(user_id, execution_interval, check_interval, key, output_directo
         execute_time = start_time + datetime.timedelta(seconds=execution_interval)
         print("Starting Process at " + start_time.isoformat())
         print("Next Execution at " + execute_time.isoformat())
-        get_videos(get_subs(user_id, key), key, output_directory, num_days)
-        print("Execution Complete waiting until " + execute_time.isoformat())
+
+        try: 
+            get_videos(get_subs(user_id, key), key, output_directory, num_days)
+            print("Execution Complete waiting until " + execute_time.isoformat())
+        except socket.timeout as e:
+            print("Exception Raised during Execution. Waiting until " + execute_time.isoformat())
+            print(e)
         while(execute_time > datetime.datetime.now()):
             time.sleep(check_interval)
 
