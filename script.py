@@ -6,6 +6,7 @@
 
 import sys
 import os
+import glob
 import argparse
 import socket
 import datetime
@@ -94,10 +95,12 @@ def get_videos(channel_list, key, output_directory, num_days):
     TIME_STRING = (datetime.datetime.now() - datetime.timedelta(days=num_days)).isoformat()
     TIME_STRING = TIME_STRING.split('T')[0]+"T00:00:00Z"
     youtube = build('youtube', 'v3', developerKey=key)
-    VIDEO_LIST = []
+
+    video_id_list = []
+    video_title_list = []
     for CHANNEL in channel_list:
         search_response = youtube.search().list(
-            part="id",
+            part="id,snippet",
             type='video',
             order='date',
             channelId=CHANNEL,
@@ -106,14 +109,12 @@ def get_videos(channel_list, key, output_directory, num_days):
             publishedAfter=TIME_STRING
             ).execute()
         for item in search_response['items']: 
-            VIDEO_LIST.append(item['id']['videoId'])
-    for VIDEO in VIDEO_LIST: 
-        call(["youtube-dl", "-o", output_directory+"/%(title)s.%(ext)s", VIDEO])
+            video_title_list.append(item['snippet']['title']+".mp4")
+            video_id_list.append(item['id']['videoId'])
 
-    VIDEO_LIST = []
     for CHANNEL in channel_list:
         search_response = youtube.search().list(
-            part="id",
+            part="id,snippet",
             type='video',
             order='date',
             channelId=CHANNEL,
@@ -122,21 +123,25 @@ def get_videos(channel_list, key, output_directory, num_days):
             publishedAfter=TIME_STRING
             ).execute()
         for item in search_response['items']: 
-            VIDEO_LIST.append(item['id']['videoId'])
-    for VIDEO in VIDEO_LIST: 
-        call(["youtube-dl", "-o", output_directory+"/%(title)s.%(ext)s", VIDEO])
+            video_title_list.append(item['snippet']['title']+".mp4")
+            video_id_list.append(item['id']['videoId'])
 
-    delete_old(output_directory, num_days+1)
+    for video_id in video_id_list: 
+        call(["youtube-dl", "-o", output_directory+"/%(title)s.%(ext)s", video_id])
+
+    delete_old(output_directory, video_title_list)
 
 
 #Deletes older videos
-def delete_old(output_directory, days_delete):
-    if os.name == 'nt':
-        print("Cannot Delete on Windows")
-        return
-    print("Deleting the Following Videos...")
-    call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-depth", "-print"])
-    call(["find", output_directory, "-mindepth", "1", "-mtime", "+"+str(days_delete), "-delete"])
+def delete_old(output_directory, titles):
+    os.chdir(output_directory)
+    titles = [title.replace('|', '_') for title in titles]
+    titles = [title.replace('"', '\'') for title in titles]
+    for file in glob.glob("*"):
+        if file in str(titles):
+            continue 
+        print("Deleting " + file)
+        call(["rm", file])
 
 
 if __name__ == "__main__":
