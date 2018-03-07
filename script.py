@@ -15,7 +15,7 @@ import threading
 from subprocess import call
 from apiclient.discovery import build
 
-DOWNLOAD_INTERVAL = 60*30
+DOWNLOAD_INTERVAL = 60*60
 CHECK_INTERVAL = 10
 NUM_DAYS = 1
 
