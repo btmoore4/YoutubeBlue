@@ -137,6 +137,8 @@ def delete_old(output_directory, titles):
     os.chdir(output_directory)
     titles = [title.replace('|', '_') for title in titles]
     titles = [title.replace('"', '\'') for title in titles]
+    titles = [title.replace(':', ' -') for title in titles]
+    titles = [title.replace('?', '') for title in titles]
     for file in glob.glob("*"):
         if file in str(titles):
             continue 
