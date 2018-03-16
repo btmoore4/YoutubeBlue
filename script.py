@@ -26,6 +26,7 @@ def parse_arguements():
     parser.add_argument('dest', nargs='+', help='Downloads Destination')
     parser.add_argument('--key', nargs='?', help='Youtube API Key Text File')
     parser.add_argument('--user', nargs='?', help='Youtube User Channel ID Text File')
+    parser.add_argument('--repeat', nargs='?', help='Number of Times the script runs')
     args = parser.parse_args()
     
     if not args.dest or len(args.dest) != 1 or not os.path.isdir(args.dest[0]):
@@ -48,6 +49,7 @@ def youtube_blue_main():
     args = parse_arguements()
 
     OUTPUT_DIR = args.dest[0]
+    REPEAT = 100 if (args.repeat is None) else int(args.repeat)
     with open(args.key) as inputfile:
         for line in inputfile:
             KEY = line
@@ -55,17 +57,18 @@ def youtube_blue_main():
         for line in inputfile:
             USER = line
 
-    repeat_task(USER, DOWNLOAD_INTERVAL, CHECK_INTERVAL, KEY, OUTPUT_DIR, NUM_DAYS)
+    repeat_task(USER, DOWNLOAD_INTERVAL, REPEAT, CHECK_INTERVAL, KEY, OUTPUT_DIR, NUM_DAYS)
 
 
 #Executes get_videos Periodically
-def repeat_task(user_id, execution_interval, check_interval, key, output_directory, num_days):
-    while (True):
+def repeat_task(user_id, execution_interval, repeat, check_interval, key, output_directory, num_days):
+    count = 0
+    while (count < repeat):
         start_time = datetime.datetime.now()
         execute_time = start_time + datetime.timedelta(seconds=execution_interval)
         print("Starting Process at " + start_time.isoformat())
         print("Next Execution at " + execute_time.isoformat())
-
+        count = count + 1
         try: 
             get_videos(get_subs(user_id, key), key, output_directory, num_days)
             print("Execution Complete waiting until " + execute_time.isoformat())
