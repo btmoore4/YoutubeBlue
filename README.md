@@ -13,7 +13,6 @@ git clone https://github.com/btmoore4/YoutubeBlue.git && cd YoutubeBlue
 ```
 pip install youtube-dl
 ```
-```
 3. Run the script. 
 ```
 python youtube_blue.py <PATH TO DESTINATION DIRECTORY> --playlist <PLAYLIST_ID> --repeat <NUM_TIMES_TO_REPEAT
