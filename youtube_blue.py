@@ -33,8 +33,10 @@ def repeat_function(target_function, repeat=1, execution_interval=3600, check_in
         print(f"Starting Process #{count} at {start_time.isoformat()}")
         try: 
             target_function()
-            print(f"Execution Complete waiting until {execute_time.isoformat()}")
+            print(f"Execution #{count} Complete.")
         except socket.timeout as e:
-            print(f"Execution Raised during Execution. Waiting until {execute_time.isoformat()}\n{e}")
-        while(execute_time > datetime.datetime.now()):
-            time.sleep(check_interval)
+            print(f"Execution Raised during Execution #{count}: {e}")
+        if count != repeat - 1:
+            print(f"Next Execution at {execute_time.isoformat()}")
+            while(execute_time > datetime.datetime.now()):
+                time.sleep(check_interval)
